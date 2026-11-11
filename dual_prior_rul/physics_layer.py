@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Separable TGV + LL proximal layer, with active-set implicit derivatives."""
 import torch
 
 class ProxFunction(torch.autograd.Function):
@@ -8,7 +6,6 @@ class ProxFunction(torch.autograd.Function):
         d,a1,a0,u1,u0,matrices=solver.solve(z)
         if ctx.needs_input_grad[0]:
             d1,qinv,mu=matrices
-            # Active zero-residual constraints tie selected first differences.
             active1=(mu*u1).abs()<solver.lam-1e-5
             active0=(mu*u0).abs()<2*solver.lam-1e-5
             groups=torch.cat([torch.zeros_like(active1[...,:1],dtype=torch.long),
@@ -22,7 +19,6 @@ class ProxFunction(torch.autograd.Function):
             cq=constraints@qinv
             gram=cq@constraints.transpose(-1,-2)
             gram=gram+torch.diag_embed((~valid).to(z.dtype))
-            # Double precision solves limit numerical cancellation in stiff priors.
             correction=cq.transpose(-1,-2).double()@torch.linalg.solve(gram.double(),cq.double())
             jacobian=qinv-correction.to(z.dtype)
             ctx.save_for_backward(jacobian)
