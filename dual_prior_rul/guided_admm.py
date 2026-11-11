@@ -23,8 +23,6 @@ class Guidance:
     def __call__(self,x):
         if self.goal=='crop':return temporal_loss(self.rul,x)
         current=self.rul(x).flatten()
-        # Past window is exactly 30 cycles, ends 3 cycles earlier, reconstructed
-        # without guidance from observed history. No gradient or label in anchor.
         drop=self.anchor-current;tau=self.tolerance
         return .5*(torch.relu(-drop-tau).square()+torch.relu(drop-3/125-tau).square())*self.valid
     def gradient(self,x):
@@ -38,14 +36,6 @@ class GuidedADMM:
         self.physics=PhysicsLayer(curvature_variance, mu=10.);self.inner_steps=inner_steps
         self.backtracks=backtracks;self.trust_limit=trust_limit;self.stats=[]
     def data_guidance(self,base_low,base_high,q1,q2,im1,im2,missing,guide,strength,iteration):
-        """Joint optimization on missing entries before either prior and dual update.
-
-        On missing coordinates the sequential unguided updates are a stationary
-        point of both original data quadratics (M coupling is zero there).
-        Thus their exact objective increment is .5 dl Q1 dl + .5 dh Q2 dh.
-        Armijo updates reduce this increment plus strength*G(base+dl+dh).
-        This is an inexact nonconvex data solve, not a convergence theorem.
-        """
         base=base_low+base_high;dl=torch.zeros_like(base);dh=torch.zeros_like(base)
         for inner in range(self.inner_steps):
             loss,gradient=guide.gradient(base+dl+dh)
