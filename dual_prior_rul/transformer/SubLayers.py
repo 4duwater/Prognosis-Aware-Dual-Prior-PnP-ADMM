@@ -35,7 +35,7 @@ class MultiHeadAttention(nn.Module):
         q, k, v = q.transpose(1, 2), k.transpose(1, 2), v.transpose(1, 2)
 
         if mask is not None:
-            mask = mask.unsqueeze(1)   # For head axis broadcasting.
+            mask = mask.unsqueeze(1) 
 
         q, attn = self.attention(q, k, v, mask=mask)
         q = q.transpose(1, 2).contiguous().view(sz_b, len_q, -1)
@@ -50,8 +50,8 @@ class MultiHeadAttention(nn.Module):
 class PositionwiseFeedForward(nn.Module):
     def __init__(self, d_in, d_hid, dropout=0.1):
         super().__init__()
-        self.w_1 = nn.Linear(d_in, d_hid) # position-wise
-        self.w_2 = nn.Linear(d_hid, d_in) # position-wise
+        self.w_1 = nn.Linear(d_in, d_hid) 
+        self.w_2 = nn.Linear(d_hid, d_in)
         self.layer_norm = nn.LayerNorm(d_in, eps=1e-6)
         self.dropout = nn.Dropout(dropout)
 
