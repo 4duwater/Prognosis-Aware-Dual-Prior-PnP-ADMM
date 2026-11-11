@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# Adapted for the denoising autoencoder. See licenses/README.md.
 import torch
 import torch.nn as nn
 import math
@@ -49,20 +47,6 @@ class Gating(nn.Module):
         return torch.matmul(hh_i, self.W_e) + self.b_e # (the final output is 1,1,1,128 as the encoder has size of 128.)
         
 class FixedPositionalEncoding(nn.Module):
-    """Inject some information about the relative or absolute position of the tokens
-        in the sequence. The positional encodings have the same dimension as
-        the embeddings, so that the two can be summed. Here, we use sine and cosine
-        functions of different frequencies.
-    .. math::
-        \text{PosEncoder}(pos, 2i) = sin(pos/10000^(2i/d_model))
-        \text{PosEncoder}(pos, 2i+1) = cos(pos/10000^(2i/d_model))
-        \text{where pos is the word position and i is the embed idx)
-    Args:
-        d_model: the embed dim (required).
-        dropout: the dropout value (default=0.1).
-        max_len: the max. length of the incoming sequence (default=1024).
-    """
-
     def __init__(self, d_model, dropout=0.1, max_len=1024, scale_factor=1.0):
         super(FixedPositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(p=dropout)
@@ -77,15 +61,6 @@ class FixedPositionalEncoding(nn.Module):
         self.layer_norm = nn.LayerNorm(d_model, eps=1e-6)
 
     def forward(self, x):
-        r"""Inputs of forward function
-        Args:
-            x: the sequence fed to the positional encoder model (required).
-        Shape:
-            x: [sequence length, batch size, embed dim]
-            output: [sequence length, batch size, embed dim]
-        """
-
-
         #x = x + self.pe[:x.size(0), :]
         x = x.permute(2,0,1)
      
@@ -93,32 +68,17 @@ class FixedPositionalEncoding(nn.Module):
         x = self.layer_norm(self.dropout(x))
         return x.transpose(0,1)
 
-
-    
-    # 将以下代码添加到 model.py 的最下方
-
 class PretrainTransformer(nn.Module):
-    """
-    预训练去噪器 (Denoiser)：
-    这是一个基于 Transformer 的自编码器 (AutoEncoder)。
-    目标是将损坏的输入序列 (例如带有 40% Mask) 重构为原始的纯净序列。
-    """
     def __init__(self, seq_size=50, patch_size=10, in_chans=14, embed_dim=128, depth=2, num_heads=4):
         super().__init__()
         self.seq_size = seq_size
         self.in_chans = in_chans
-        
-        # 复用你写好的 Gating 机制
         self.gating = Gating(in_chans, embed_dim, seq_size)
         self.pos_encoder = FixedPositionalEncoding(embed_dim, max_len=1024)
-
-        # 编码器 Block (复用现有的 Encoder)
         self.encoder_block = nn.Sequential(
             Encoder(depth, num_heads, embed_dim//num_heads, embed_dim//num_heads, embed_dim, embed_dim//2),
             nn.Linear(embed_dim, embed_dim)
         )
-
-        # 解码器 (Decoder): 将高维特征投影回原始的传感器通道数 (例如 14 维)
         self.decoder = nn.Sequential(
             nn.Linear(embed_dim, embed_dim // 2),
             nn.ReLU(inplace=True),
@@ -131,14 +91,8 @@ class PretrainTransformer(nn.Module):
         return enc_x
 
     def forward(self, seq):
-        # 1. Gating 与升维
         gcu_out = self.gating(seq)
-        
-        # 2. Transformer 编码提取特征
         latent_x = self.forward_encoder(gcu_out)
-        
-        # 3. 逐帧解码回原始维度
-        # latent_x shape: (Batch, Seq_len, embed_dim)
         out = self.decoder(latent_x) # output shape: (Batch, Seq_len, in_chans)
         
         return out
