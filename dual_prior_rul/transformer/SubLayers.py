@@ -1,13 +1,8 @@
-# Transformer code lineage: Guo Haoren and Victor Huang. See licenses/README.md.
-# -*- coding: utf-8 -*-
-''' Define the sublayers in encoder/decoder layer '''
 import torch.nn as nn
 import torch.nn.functional as F
 from .Modules import ScaledDotProductAttention
 
 class MultiHeadAttention(nn.Module):
-    ''' Multi-Head Attention module '''
-
     def __init__(self, n_head, d_model, d_k, d_v, dropout=0.1):
         super().__init__()
 
@@ -59,8 +54,6 @@ class MultiHeadAttention(nn.Module):
 
 
 class PositionwiseFeedForward(nn.Module):
-    ''' A two-feed-forward-layer module '''
-
     def __init__(self, d_in, d_hid, dropout=0.1):
         super().__init__()
         self.w_1 = nn.Linear(d_in, d_hid) # position-wise
