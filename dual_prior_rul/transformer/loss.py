@@ -38,7 +38,7 @@ class hierarchical_contrastive_loss(torch.nn.Module):
         loss = (logits[:, t, T + t - 1].mean() + logits[:, T + t, t].mean()) / 2
         return loss
     def forward(self, z1, z2, alpha=0.5, temporal_unit=0):
-        loss = torch.tensor(0., device=self.device) #, device=z1.device
+        loss = torch.tensor(0., device=self.device)
         d = 0
         while z1.size(1) > 1:
             if alpha != 0:
