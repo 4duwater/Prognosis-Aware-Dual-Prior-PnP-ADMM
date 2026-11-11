@@ -6,7 +6,6 @@ RUL_SCALE = 125.0
 
 
 def temporal_loss(rul,x):
-    # Prefix ends three cycles earlier; suffix and full window share endpoint.
     full=rul(x).flatten();early=rul(x[:,:-3]).flatten();late=rul(x[:,3:]).flatten()
     return .5*(full-late).square()+.5*torch.relu(late-early).square()+.5*torch.relu(early-late-3/125).square()
 
