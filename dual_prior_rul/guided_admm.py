@@ -96,8 +96,6 @@ class GuidedADMM:
         inv1=torch.linalg.inv(q1);inv2=torch.linalg.inv(q2)
         missing=1-mask
         if enabled and update=='data':
-            # Restrict metric to the missing coordinate subspace; observed rows
-            # are independent identity blocks, so guidance cannot alter them.
             mt=missing.transpose(1,2)
             im1=torch.linalg.inv(q1*mt.unsqueeze(-1)*mt.unsqueeze(-2)+torch.diag_embed(mask.transpose(1,2)))
             im2=torch.linalg.inv(q2*mt.unsqueeze(-1)*mt.unsqueeze(-2)+torch.diag_embed(mask.transpose(1,2)))
@@ -106,7 +104,6 @@ class GuidedADMM:
             high=mv(inv2,mask*(obs-low)+rho*(v-u2))
             if enabled and update=='data':
                 low,high=self.data_guidance(low,high,q1,q2,im1,im2,missing,guide,strength,iteration)
-            # Both prior outputs now see the guided variables BEFORE dual updates.
             d=self.physics(low+u1);v=den(high+u2)
             if enabled and update=='post':
                 _,gradient=guide.gradient(low+high)
