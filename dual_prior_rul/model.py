@@ -37,14 +37,14 @@ class Gating(nn.Module):
     def forward(self, x):
 
         x = x
-        x_i = x #only applying the gating on the current row even with the stack of 3 rows cames as input (1,1,30,14)
-        h_i = self.cnn_layers(x) # shape becomes 1,1,1,14 as the nn.conv2d has output channel as 1 but the convolution is applied on whole past input (stack of three)
+        x_i = x
+        h_i = self.cnn_layers(x) 
         r_i = torch.sigmoid(torch.matmul(h_i, self.W_r) + torch.matmul(x_i, self.V_r) + self.b_r)
         u_i = torch.sigmoid(torch.matmul(h_i, self.W_u) + torch.matmul(x_i, self.V_u) + self.b_u)
         # the output of the gating mechanism
         hh_i = torch.mul(h_i, u_i) + torch.mul(x_i, r_i)
 
-        return torch.matmul(hh_i, self.W_e) + self.b_e # (the final output is 1,1,1,128 as the encoder has size of 128.)
+        return torch.matmul(hh_i, self.W_e) + self.b_e 
         
 class FixedPositionalEncoding(nn.Module):
     def __init__(self, d_model, dropout=0.1, max_len=1024, scale_factor=1.0):
@@ -57,7 +57,7 @@ class FixedPositionalEncoding(nn.Module):
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
         pe = scale_factor * pe.unsqueeze(0).transpose(0, 1)
-        self.register_buffer('pe', pe)  # this stores the variable in the state_dict (used for non-trainable variables)
+        self.register_buffer('pe', pe)  
         self.layer_norm = nn.LayerNorm(d_model, eps=1e-6)
 
     def forward(self, x):
