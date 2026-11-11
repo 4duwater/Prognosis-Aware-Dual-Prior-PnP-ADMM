@@ -8,17 +8,15 @@ class Gating(nn.Module):
         super().__init__()
         self.m = m
         self.seq_len = seq_len
-        # the reset gate r_i
+
         self.W_r = nn.Parameter(torch.Tensor(m, m))
         self.V_r = nn.Parameter(torch.Tensor(m, m))
         self.b_r = nn.Parameter(torch.Tensor(m))
 
-        # the update gate u_i
         self.W_u = nn.Parameter(torch.Tensor(m, m))
         self.V_u = nn.Parameter(torch.Tensor(m, m))
         self.b_u = nn.Parameter(torch.Tensor(m))
 
-        # the output
         self.W_e = nn.Parameter(torch.Tensor(m, d_model))
         self.b_e = nn.Parameter(torch.Tensor(d_model))
 
@@ -41,7 +39,6 @@ class Gating(nn.Module):
         h_i = self.cnn_layers(x) 
         r_i = torch.sigmoid(torch.matmul(h_i, self.W_r) + torch.matmul(x_i, self.V_r) + self.b_r)
         u_i = torch.sigmoid(torch.matmul(h_i, self.W_u) + torch.matmul(x_i, self.V_u) + self.b_u)
-        # the output of the gating mechanism
         hh_i = torch.mul(h_i, u_i) + torch.mul(x_i, r_i)
 
         return torch.matmul(hh_i, self.W_e) + self.b_e 
@@ -61,7 +58,6 @@ class FixedPositionalEncoding(nn.Module):
         self.layer_norm = nn.LayerNorm(d_model, eps=1e-6)
 
     def forward(self, x):
-        #x = x + self.pe[:x.size(0), :]
         x = x.permute(2,0,1)
      
         x = x + self.pe[:x.size(0),:]
