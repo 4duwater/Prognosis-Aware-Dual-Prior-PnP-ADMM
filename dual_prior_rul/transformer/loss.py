@@ -12,10 +12,10 @@ class hierarchical_contrastive_loss(torch.nn.Module):
         B, T = z1.size(0), z1.size(1)
         if B == 1:
             return z1.new_tensor(0.)
-        z = torch.cat([z1, z2], dim=0)  # 2B x T x C
-        z = z.transpose(0, 1)  # T x 2B x C
-        sim = torch.matmul(z, z.transpose(1, 2))  # T x 2B x 2B
-        logits = torch.tril(sim, diagonal=-1)[:, :, :-1]  # T x 2B x (2B-1)
+        z = torch.cat([z1, z2], dim=0) 
+        z = z.transpose(0, 1)  
+        sim = torch.matmul(z, z.transpose(1, 2)) 
+        logits = torch.tril(sim, diagonal=-1)[:, :, :-1] 
         logits += torch.triu(sim, diagonal=1)[:, :, 1:]
         logits = -F.log_softmax(logits, dim=-1)
 
@@ -28,9 +28,9 @@ class hierarchical_contrastive_loss(torch.nn.Module):
         B, T = z1.size(0), z1.size(1)
         if T == 1:
             return z1.new_tensor(0.)
-        z = torch.cat([z1, z2], dim=1)  # B x 2T x C
-        sim = torch.matmul(z, z.transpose(1, 2))  # B x 2T x 2T
-        logits = torch.tril(sim, diagonal=-1)[:, :, :-1]  # B x 2T x (2T-1)
+        z = torch.cat([z1, z2], dim=1) 
+        sim = torch.matmul(z, z.transpose(1, 2))  
+        logits = torch.tril(sim, diagonal=-1)[:, :, :-1]  
         logits += torch.triu(sim, diagonal=1)[:, :, 1:]
         logits = -F.log_softmax(logits, dim=-1)
 
