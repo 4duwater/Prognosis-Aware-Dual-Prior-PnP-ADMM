@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Fixed priors, equal-length temporal reference, constrained guided data updates."""
 import torch
 from .core import temporal_loss
 from .pnp_admm import lowpass,frequency_projectors
