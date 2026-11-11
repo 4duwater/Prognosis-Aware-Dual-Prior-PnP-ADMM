@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Differentiable reconstruction and temporal loss for optional guidance."""
 import torch
 from .pnp_admm import lowpass,frequency_projectors
 from .physics_layer import PhysicsLayer
