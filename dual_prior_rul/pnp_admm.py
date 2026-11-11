@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Shared reconstruction implementation: low-frequency physics, high-frequency denoiser."""
 import torch
 import torch.nn.functional as F
 
@@ -15,7 +13,6 @@ def split_components(x):
 
 
 def frequency_projectors(x, low_modes=6):
-    # Orthonormal DCT-II time basis; bands span all original time coordinates.
     n=x.shape[1]
     t=torch.arange(n,device=x.device,dtype=x.dtype).unsqueeze(1)
     k=torch.arange(n,device=x.device,dtype=x.dtype).unsqueeze(0)
