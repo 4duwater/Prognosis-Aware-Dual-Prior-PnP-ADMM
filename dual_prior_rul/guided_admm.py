@@ -42,7 +42,7 @@ class GuidedADMM:
             gl=(mv(q1,dl)+strength*gradient)*missing
             gh=(mv(q2,dh)+strength*gradient)*missing
             pl=-mv(im1,gl);ph=-mv(im2,gh)
-            # One common scale per sample preserves the preconditioned direction.
+
             maximum=(pl+ph).abs().flatten(1).max(1).values
             scale=(self.trust_limit/maximum.clamp_min(1e-20)).clamp_max(1)
             pl=pl*scale[:,None,None];ph=ph*scale[:,None,None]
