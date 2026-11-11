@@ -12,8 +12,6 @@ __all__ = ["DualPriorReconstructor", "PretrainTransformer", "RUL_SCALE", "split_
 
 
 class DualPriorReconstructor(nn.Module):
-    """Restore C-MAPSS windows of shape (batch, 30 cycles, 14 sensors)."""
-
     def __init__(self, curvature_variance):
         super().__init__()
         variance = torch.as_tensor(curvature_variance, dtype=torch.float64).detach().clone()
@@ -80,5 +78,4 @@ class DualPriorReconstructor(nn.Module):
             )
 
     def forward(self, observed, mask, **guidance):
-        """Return the reconstructed sensor window."""
         return self.reconstruct(observed, mask, **guidance)
