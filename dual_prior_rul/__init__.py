@@ -37,7 +37,6 @@ class DualPriorReconstructor(nn.Module):
 
     def reconstruct(self, observed, mask, *, predictor=None, history=None,
                     history_mask=None, history_valid=None, guidance_strength=0.0):
-        """Restore the input. With zero guidance this is differentiable."""
         observed, mask = self._observations(observed, mask)
         if not math.isfinite(guidance_strength) or guidance_strength < 0:
             raise ValueError("guidance_strength must be finite and nonnegative")
