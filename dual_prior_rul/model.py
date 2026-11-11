@@ -4,7 +4,7 @@ import math
 from .transformer.Layers import Encoder
 
 class Gating(nn.Module):
-    def __init__(self, m,d_model, seq_len): # 128,128
+    def __init__(self, m,d_model, seq_len):
         super().__init__()
         self.m = m
         self.seq_len = seq_len
@@ -51,7 +51,7 @@ class FixedPositionalEncoding(nn.Module):
         super(FixedPositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(p=dropout)
 
-        pe = torch.zeros(max_len, d_model)  # positional encoding
+        pe = torch.zeros(max_len, d_model)  
         position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
         div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
         pe[:, 0::2] = torch.sin(position * div_term)
@@ -93,6 +93,6 @@ class PretrainTransformer(nn.Module):
     def forward(self, seq):
         gcu_out = self.gating(seq)
         latent_x = self.forward_encoder(gcu_out)
-        out = self.decoder(latent_x) # output shape: (Batch, Seq_len, in_chans)
+        out = self.decoder(latent_x)
         
         return out
