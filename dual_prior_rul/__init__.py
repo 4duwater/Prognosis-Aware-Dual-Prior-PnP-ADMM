@@ -1,5 +1,3 @@
-"""Dual-prior reconstruction with optional prediction guidance."""
-
 import math
 
 import torch
